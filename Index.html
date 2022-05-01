@@ -1,0 +1,204 @@
+<h1>Hi Colm</h1>
+
+<div>
+    <h1>Inventory</h1>
+    <textarea id="textArea0" name="textArea0" rows="15" cols="150"></textarea>
+
+   
+</div>
+<div>
+    <h1>Search</h1>
+    <label for="book_id">book_id:</label>
+    <input type="text" id="book_id" name="book_id" required size="10">
+    <button style="margin: 5px;" id="book_idButton">Search</button>
+    <label for="book_id">9781593279509</label>
+    <br>
+    <textarea id="textArea1" name="textArea1" rows="15" cols="150"></textarea>
+
+</div>
+<div>
+    <h1>Order</h1>
+    <label for="book_idOrder">Enter Book_id:</label>
+    <input type="text" id="book_idOrder" name="book_idOrder" required size="10">
+    <label for="book_idOrder">9781593279509</label>
+    <br>
+
+    <label for="quantity">Enter Quantity:</label>
+    <input type="text" id="quantity" name="quantity" required size="10">
+    <label for="quantity">2</label>
+    <br>
+
+    <label for="book_idOrder">Enter Name:</label>
+    <input type="text" id="nameid" name="book_idOrder" required size="10">
+    <label for="book_idOrder">Jamie Donohoe</label>
+    <br>
+
+    <label for="book_idOrder">Enter Email:</label>
+    <input type="text" id="emailid" name="book_idOrder" required size="10">
+    <label for="book_idOrder">jamie@mail.com</label>
+    <br>
+    <label for="quantity">Enter Address:</label>
+    <input type="text" id="addressid" name="quantity" required size="10">
+    <label for="quantity">Main street Sligo Ireland</label>
+    <br>
+    <button id="orderButton">Order Book</button>
+    <br>
+
+    <h4 id="infoOrder"> After you order your book, please wait a few seconds and refresh the page to check your order is in the order table </h4>
+    
+</div>
+<div>
+    <textarea id="textArea3" name="textArea3" rows="15" cols="150"></textarea>
+
+</div>
+<div>
+    <h1>Sales</h1>
+
+    <textarea id="textArea4" name="textArea4" rows="15" cols="150"></textarea>
+
+</div>
+<script>
+
+
+///////////////////////// INVENTORY SERVICE
+var textArea0 = document.getElementById('textArea0')
+
+ fetch('https://is3et25g6d.execute-api.eu-west-1.amazonaws.com/prod/inventory', { method: 'GET' })
+                    .then(response => response.json())
+                    .then(json => {
+                        console.log(json)
+                        var pretty = JSON.stringify(json, null, '\t')
+                        console.log(pretty)
+                        document.getElementById("textArea0").value = "";
+                        textArea0.value += pretty;
+                    })
+                    .catch(error => console.error(error))
+
+///////////////////////// Search SERVICE
+document.getElementById('book_idButton').onclick = function () {
+            var newISBN = null
+            var textArea = null
+            document.getElementById("textArea1").value = "";
+            newISBN = document.getElementById("book_id").value;
+            textArea = document.getElementById('textArea1')
+
+            if (newISBN != "") {
+                fetch('https://is3et25g6d.execute-api.eu-west-1.amazonaws.com/prod/search?book_id=' + newISBN, { method: 'GET' })
+                    .then(response => response.json())
+                    .then(json => {
+                        var pretty = JSON.stringify(json, null, '\t')
+                        document.getElementById("book_id").value = "";
+                        textArea.value += pretty;
+                    })
+                    .catch(error => console.error(error))
+            }
+            else {
+                alert("No value in field");
+            }
+        };
+
+
+/////////////////////// CART SERVICE
+            
+
+            document.getElementById('orderButton').onclick = function () {
+
+            
+
+            var orderNum = document.getElementById("book_idOrder").value;
+            var quantity = document.getElementById("quantity").value;
+            var nameVar = document.getElementById("nameid").value;
+            var addressVar = document.getElementById("addressid").value;
+            var emailVar = document.getElementById("emailid").value;
+
+            var objToPost = {
+                book_id: orderNum,
+                quantity: quantity,
+                name: nameVar,
+                address: addressVar,
+                email: emailVar
+            }
+
+            
+
+            // SEND off to be confrim order
+
+            if (orderNum != "" && quantity != "" && nameVar != "" && addressVar != "" && emailVar != "") {
+                
+
+            fetch('https://is3et25g6d.execute-api.eu-west-1.amazonaws.com/prod/order', { method: 'POST', body: JSON.stringify(objToPost) })
+                    .then(response => response.json())
+                    .then(json => {
+                    var pretty = JSON.stringify(json, null, '\t')
+                    console.log(json)
+                })
+                    .catch(error => console.error(error))
+                
+            }
+            else {
+                alert("Check values in fields");
+
+            }             
+
+                  
+
+            document.getElementById("book_idOrder").value = "";
+            document.getElementById("quantity").value = "";
+            document.getElementById("nameid").value = "";
+            document.getElementById("addressid").value = "";
+            document.getElementById("emailid").value = "";
+
+            // RETURN response
+            
+
+            // DISPLAY ORDER for user
+
+            var orderNum = document.getElementById("infoOrder");
+
+            orderNum.value += "YOUR ORDER HAS BEEN SENT, Please refresh the page and check the orders section"
+
+            location.reload();
+
+
+        };
+
+/////////////////////// SALES SERVICE
+
+var textArea4 = document.getElementById('textArea4')
+
+ fetch('https://is3et25g6d.execute-api.eu-west-1.amazonaws.com/prod/sales', { method: 'GET' })
+                    .then(response => response.json())
+                    .then(json => {
+                        console.log(json)
+                        var pretty = JSON.stringify(json, null, '\t')
+                        console.log(pretty)
+                        document.getElementById("textArea4").value = "";
+                        textArea4.value += pretty;
+                    })
+                    .catch(error => console.error(error))
+
+
+
+//////////////////// ORDER SERVICE
+
+var textArea3 = document.getElementById('textArea3')
+
+fetch('https://is3et25g6d.execute-api.eu-west-1.amazonaws.com/prod/order', { method: 'GET' })
+                    .then(response => response.json())
+                    .then(json => {
+                        console.log(json)
+                        var pretty = JSON.stringify(json, null, '\t')
+                        console.log(pretty)
+                        document.getElementById("textArea3").value = "";
+                        textArea3.value += pretty;
+                    })
+                    .catch(error => console.error(error))
+
+
+
+
+
+
+            
+        
+</script>
